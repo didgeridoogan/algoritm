@@ -1,17 +1,71 @@
-#include <ncurses.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "raylib.h"
 
-int main(void)
+typedef struct map_t
 {
-    initscr(); //Startar upp nscurses systemet och låter en kalla på alla andra funktioner i vår terminal.
-    noecho(); //Förhindrar initscr från att rita ut allting på direkten
-    curs_set(0); //Gör cursorn osynlig
+    int tile_size;
+    int tiles[10][10];
+} map_t;
 
-    while(getch() != 'q')
+typedef enum tiles_e
+{
+    TILE_FLOOR,
+    TILE_WALL,
+    TILE_WATER
+} tiles_e;
+
+void DrawMap(map_t map, int x, int y)
+{
+    for (int y = 0; y < 10; y++)
     {
-        mvaddch(10,20,'@');
+        for (int x = 0; x < 10; x++)
+        {
+            switch (map.tiles[y][x])
+            {
+            case TILE_FLOOR:
+            {
+                DrawRectangle(x * map.tile_size, y * map.tile_size, map.tile_size, map.tile_size, GREEN);
+            }
+            break;
+            case TILE_WALL:
+            {
+                DrawRectangle(x * map.tile_size, y * map.tile_size, map.tile_size, map.tile_size, ORANGE);
+            }
+            break;
+            case TILE_WATER:
+            {
+                DrawRectangle(x * map.tile_size, y * map.tile_size, map.tile_size, map.tile_size, BLUE);
+            }
+            }
+        }
     }
+}
 
-    endwin();
+int main()
+{
+    map_t main_map = (map_t){
+        .tile_size = 16,
+        .tiles = {
+            {1, 1, 1, 2, 1, 1, 1, 1, 1, 1},
+            {1, 0, 0, 2, 0, 0, 0, 0, 0, 1},
+            {1, 0, 0, 2, 0, 0, 0, 0, 0, 1},
+            {1, 0, 0, 2, 0, 0, 0, 0, 0, 1},
+            {1, 0, 1, 2, 2, 2, 0, 1, 1, 1},
+            {1, 0, 1, 1, 0, 2, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 2, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 2, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 2, 0, 0, 0, 1},
+            {1, 1, 1, 1, 1, 2, 1, 1, 1, 1},
+        }};
 
-    return 0;
+    InitWindow(165, 165, "Tilemap");
+
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+        ClearBackground(BLACK);
+        DrawMap(main_map, 0, 0);
+        EndDrawing();
+    }
 }
